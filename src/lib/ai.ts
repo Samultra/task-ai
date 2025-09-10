@@ -2,8 +2,16 @@ const API_URL = "https://openrouter.ai/api/v1/chat/completions";
 
 function getApiKey(): string {
 	const key = import.meta.env.VITE_OPENROUTER_API_KEY as string;
-	console.log('OpenRouter API Key:', key ? `${key.substring(0, 10)}...` : 'NOT FOUND');
+	console.log('=== OpenRouter API Key Debug ===');
+	console.log('Raw env value:', import.meta.env.VITE_OPENROUTER_API_KEY);
+	console.log('Key exists:', !!key);
+	console.log('Key length:', key ? key.length : 0);
+	console.log('Key starts with sk-or:', key ? key.startsWith('sk-or') : false);
+	console.log('Key preview:', key ? `${key.substring(0, 15)}...` : 'NOT FOUND');
+	console.log('================================');
+	
 	if (!key) throw new Error('VITE_OPENROUTER_API_KEY is missing');
+	if (!key.startsWith('sk-or')) throw new Error('API key format is invalid - should start with "sk-or"');
 	return key;
 }
 
@@ -25,20 +33,41 @@ function getModel(): string {
 
 async function callOpenRouter(messages: { role: "user"|"assistant"|"system"; content: string }[]) {
 	const model = getModel();
+	const apiKey = getApiKey();
+	
+	console.log('=== OpenRouter Request Debug ===');
 	console.log('Using model:', model);
+	console.log('API URL:', API_URL);
+	console.log('Authorization header:', `Bearer ${apiKey.substring(0, 15)}...`);
+	console.log('Request body:', JSON.stringify({ model, messages, temperature: 0.6 }, null, 2));
+	console.log('================================');
+	
+	const requestBody = { model, messages, temperature: 0.6 };
 	
 	const res = await fetch(API_URL, {
 		method: 'POST',
 		headers: {
 			'Content-Type': 'application/json',
-			'Authorization': `Bearer ${getApiKey()}`,
+			'Authorization': `Bearer ${apiKey}`,
+			'HTTP-Referer': window.location.origin,
+			'X-Title': 'TaskAI'
 		},
-		body: JSON.stringify({ model, messages, temperature: 0.6 })
+		body: JSON.stringify(requestBody)
 	});
+	
 	const text = await res.text();
-	console.log('OpenRouter response status:', res.status);
-	console.log('OpenRouter response:', text);
-	if (!res.ok) throw new Error(text || `OpenRouter ${res.status}`);
+	console.log('=== OpenRouter Response Debug ===');
+	console.log('Response status:', res.status);
+	console.log('Response headers:', Object.fromEntries(res.headers.entries()));
+	console.log('Response body:', text);
+	console.log('================================');
+	
+	if (!res.ok) {
+		const errorMsg = `OpenRouter API Error ${res.status}: ${text}`;
+		console.error(errorMsg);
+		throw new Error(errorMsg);
+	}
+	
 	const json = JSON.parse(text);
 	return (json.choices?.[0]?.message?.content ?? '').trim();
 }
