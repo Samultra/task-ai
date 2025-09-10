@@ -1,16 +1,30 @@
 const API_URL = "https://openrouter.ai/api/v1/chat/completions";
 
 function getApiKey(): string {
-	const key = import.meta.env.VITE_OPENROUTER_API_KEY as string;
+	// Попробуем несколько способов получить API ключ
+	let key = import.meta.env.VITE_OPENROUTER_API_KEY as string;
+	
+	// Fallback для GitHub Pages - попробуем получить из window
+	if (!key && typeof window !== 'undefined') {
+		key = (window as any).OPENROUTER_API_KEY;
+	}
+	
 	console.log('=== OpenRouter API Key Debug ===');
+	console.log('Environment:', import.meta.env.MODE);
 	console.log('Raw env value:', import.meta.env.VITE_OPENROUTER_API_KEY);
+	console.log('Window value:', typeof window !== 'undefined' ? (window as any).OPENROUTER_API_KEY : 'N/A');
 	console.log('Key exists:', !!key);
 	console.log('Key length:', key ? key.length : 0);
 	console.log('Key starts with sk-or:', key ? key.startsWith('sk-or') : false);
 	console.log('Key preview:', key ? `${key.substring(0, 15)}...` : 'NOT FOUND');
 	console.log('================================');
 	
-	if (!key) throw new Error('VITE_OPENROUTER_API_KEY is missing');
+	if (!key) {
+		console.error('API key not found! Please check:');
+		console.error('1. VITE_OPENROUTER_API_KEY environment variable');
+		console.error('2. window.OPENROUTER_API_KEY for GitHub Pages');
+		throw new Error('VITE_OPENROUTER_API_KEY is missing - check console for details');
+	}
 	if (!key.startsWith('sk-or')) throw new Error('API key format is invalid - should start with "sk-or"');
 	return key;
 }
