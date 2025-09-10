@@ -2,6 +2,7 @@ const API_URL = "https://openrouter.ai/api/v1/chat/completions";
 
 function getApiKey(): string {
 	const key = import.meta.env.VITE_OPENROUTER_API_KEY as string;
+	console.log('OpenRouter API Key:', key ? `${key.substring(0, 10)}...` : 'NOT FOUND');
 	if (!key) throw new Error('VITE_OPENROUTER_API_KEY is missing');
 	return key;
 }
@@ -20,6 +21,8 @@ async function callOpenRouter(messages: { role: "user"|"assistant"|"system"; con
 		body: JSON.stringify({ model: getModel(), messages, temperature: 0.6 })
 	});
 	const text = await res.text();
+	console.log('OpenRouter response status:', res.status);
+	console.log('OpenRouter response:', text);
 	if (!res.ok) throw new Error(text || `OpenRouter ${res.status}`);
 	const json = JSON.parse(text);
 	return (json.choices?.[0]?.message?.content ?? '').trim();
