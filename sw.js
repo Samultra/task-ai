@@ -9,11 +9,11 @@ self.addEventListener('activate', (event) => {
 self.addEventListener('message', (event) => {
 	const data = event.data || {};
 	if (data.type === 'SHOW_NOTIFICATION') {
-		const base = self.registration.scope || '/task-sage-sidekick/';
+		const base = self.registration.scope || '/task-ai/';
 		self.registration.showNotification(data.title || 'TaskAI', {
 			body: data.body || '',
-			icon: base + 'taskAI.png?v=6',
-			badge: base + 'taskAI.png?v=6',
+			icon: base + 'taskAI.png?v=18',
+			badge: base + 'taskAI.png?v=18',
 			data: data.payload || {},
 		});
 	}
