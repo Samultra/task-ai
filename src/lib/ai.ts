@@ -8,17 +8,32 @@ function getApiKey(): string {
 }
 
 function getModel(): string {
-	return (import.meta.env.VITE_OPENROUTER_MODEL as string) || "openai/gpt-4o-mini";
+	// Попробуем бесплатные модели по порядку
+	const freeModels = [
+		"meta-llama/llama-3.1-8b-instruct:free",
+		"microsoft/phi-3-mini-128k-instruct:free", 
+		"google/gemma-2-9b-it:free",
+		"openai/gpt-4o-mini" // fallback на платную
+	];
+	
+	const envModel = import.meta.env.VITE_OPENROUTER_MODEL as string;
+	if (envModel) return envModel;
+	
+	// Используем первую бесплатную модель
+	return freeModels[0];
 }
 
 async function callOpenRouter(messages: { role: "user"|"assistant"|"system"; content: string }[]) {
+	const model = getModel();
+	console.log('Using model:', model);
+	
 	const res = await fetch(API_URL, {
 		method: 'POST',
 		headers: {
 			'Content-Type': 'application/json',
 			'Authorization': `Bearer ${getApiKey()}`,
 		},
-		body: JSON.stringify({ model: getModel(), messages, temperature: 0.6 })
+		body: JSON.stringify({ model, messages, temperature: 0.6 })
 	});
 	const text = await res.text();
 	console.log('OpenRouter response status:', res.status);
