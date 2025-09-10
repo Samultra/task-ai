@@ -6,3 +6,9 @@
 
 /*.js
   Content-Type: application/javascript
+
+/*.png
+  Content-Type: image/png
+
+/*.svg
+  Content-Type: image/svg+xml
