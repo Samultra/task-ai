@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TaskAI - Simple Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            min-height: 100vh;
+        }
+        .container {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 30px;
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+        h1 {
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 2.5em;
+        }
+        .task {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 8px;
+            border-left: 4px solid #4CAF50;
+        }
+        .priority-high {
+            border-left-color: #f44336;
+        }
+        .priority-medium {
+            border-left-color: #ff9800;
+        }
+        .priority-low {
+            border-left-color: #4CAF50;
+        }
+        .status {
+            text-align: center;
+            margin: 20px 0;
+            padding: 10px;
+            background: rgba(76, 175, 80, 0.3);
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧠 TaskAI</h1>
+        <div class="status">
+            ✅ Сайт работает! JavaScript загружается корректно.
+        </div>
+        
+        <h2>Демо-задачи:</h2>
+        
+        <div class="task priority-high">
+            <h3>🔥 Настроить Supabase</h3>
+            <p>Создать .env файл с настройками Supabase для полной функциональности</p>
+            <small>Приоритет: Высокий | Категория: Разработка</small>
+        </div>
+        
+        <div class="task priority-medium">
+            <h3>📝 Демо-задача</h3>
+            <p>Это пример задачи для демонстрации интерфейса</p>
+            <small>Приоритет: Средний | Категория: Личное</small>
+        </div>
+        
+        <div class="task priority-low">
+            <h3>🎯 Изучить возможности</h3>
+            <p>Исследовать все функции TaskAI для повышения продуктивности</p>
+            <small>Приоритет: Низкий | Категория: Обучение</small>
+        </div>
+        
+        <div style="text-align: center; margin-top: 30px;">
+            <p>Если вы видите эту страницу, значит GitHub Pages работает корректно!</p>
+            <p>Проблема была в MIME типах для Vite-собранных файлов.</p>
+        </div>
+    </div>
+
+    <script>
+        console.log('TaskAI Simple Test loaded successfully!');
+        console.log('JavaScript is working on GitHub Pages!');
+        
+        // Простая интерактивность
+        document.querySelectorAll('.task').forEach(task => {
+            task.addEventListener('click', function() {
+                this.style.opacity = '0.7';
+                setTimeout(() => {
+                    this.style.opacity = '1';
+                }, 200);
+            });
+        });
+    </script>
+</body>
+</html>

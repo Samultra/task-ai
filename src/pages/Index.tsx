@@ -8,7 +8,7 @@ import TaskCard, { Task } from "@/components/TaskCard";
 import TaskForm from "@/components/TaskForm";
 import AIChat from "@/components/AIChat";
 import { useToast } from "@/hooks/use-toast";
-import { supabase } from "@/lib/supabase";
+import { supabase, isSupabaseConfigured } from "@/lib/supabase";
 import { registerServiceWorker, requestPermission, startTipsScheduler, stopTipsScheduler, showNotification } from "@/lib/notifications";
 
 const Index = () => {
@@ -20,6 +20,39 @@ const Index = () => {
 
   const loadTasks = async () => {
     console.log('Loading tasks...', new Date().toISOString());
+    
+    if (!isSupabaseConfigured()) {
+      console.warn('Supabase not configured, using demo tasks');
+      // Показываем демо-задачи, если Supabase не настроен
+      const demoTasks: Task[] = [
+        {
+          id: "1",
+          title: "Настроить Supabase",
+          description: "Создать .env файл с настройками Supabase",
+          completed: false,
+          priority: "high",
+          category: "Разработка",
+          createdAt: new Date(),
+        },
+        {
+          id: "2", 
+          title: "Демо-задача",
+          description: "Это пример задачи для демонстрации",
+          completed: false,
+          priority: "medium",
+          category: "Личное",
+          createdAt: new Date(),
+        }
+      ];
+      setTasks(demoTasks);
+      toast({ 
+        title: "Supabase не настроен", 
+        description: "Создайте .env файл с настройками Supabase. См. SUPABASE_SETUP_INSTRUCTIONS.md", 
+        variant: "destructive" 
+      });
+      return;
+    }
+
     try {
       const { data, error } = await supabase
         .from("tasks")
