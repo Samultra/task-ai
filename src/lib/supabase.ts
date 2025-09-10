@@ -1,7 +1,10 @@
 import { createClient } from "@supabase/supabase-js";
 
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL as string;
+const rawSupabaseUrl = import.meta.env.VITE_SUPABASE_URL as string;
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY as string;
+
+// Очищаем URL от лишних путей
+const supabaseUrl = rawSupabaseUrl ? rawSupabaseUrl.replace(/\/task-ai\/?$/, '') : rawSupabaseUrl;
 
 if (!supabaseUrl || !supabaseAnonKey) {
 	console.warn("Supabase env variables are not set. Please create .env file with VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY");
