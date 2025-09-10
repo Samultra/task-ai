@@ -12,8 +12,8 @@ self.addEventListener('message', (event) => {
 		const base = self.registration.scope || '/task-ai/';
 		self.registration.showNotification(data.title || 'TaskAI', {
 			body: data.body || '',
-			icon: base + 'taskAI.png?v=21',
-			badge: base + 'taskAI.png?v=21',
+			icon: base + 'taskAI.png?v=22',
+			badge: base + 'taskAI.png?v=22',
 			data: data.payload || {},
 		});
 	}
