@@ -23,6 +23,7 @@ function getApiKey(): string {
 		console.error('API key not found! Please check:');
 		console.error('1. VITE_OPENROUTER_API_KEY environment variable');
 		console.error('2. window.OPENROUTER_API_KEY for GitHub Pages');
+		console.error('3. Check if API key is set in index.html script');
 		throw new Error('VITE_OPENROUTER_API_KEY is missing - check console for details');
 	}
 	if (!key.startsWith('sk-or')) throw new Error('API key format is invalid - should start with "sk-or"');
