@@ -54,6 +54,10 @@ const Index = () => {
     }
 
     try {
+      if (!supabase) {
+        throw new Error('Supabase not configured');
+      }
+      
       const { data, error } = await supabase
         .from("tasks")
         .select("id, title, description, completed, priority, category, due_date, created_at")
@@ -122,6 +126,19 @@ const Index = () => {
       due_date: taskData.dueDate ? taskData.dueDate.toISOString() : null,
     };
 
+    if (!supabase) {
+      // Локальное добавление без Supabase
+      const newTask: Task = {
+        ...taskData,
+        id: String(Date.now()),
+        completed: false,
+        createdAt: new Date()
+      };
+      setTasks(prev => [newTask, ...prev]);
+      toast({ title: "Задача добавлена!", description: `"${taskData.title}" успешно добавлена в список дел.` });
+      return;
+    }
+    
     const { data, error } = await supabase.from("tasks").insert(payload).select("id, created_at").single();
 
     if (error) {
@@ -144,6 +161,12 @@ const Index = () => {
     const existing = tasks.find(t => t.id === id);
     const newCompleted = existing ? !existing.completed : true;
 
+    if (!supabase) {
+      // Локальное обновление без Supabase
+      setTasks(prev => prev.map(t => t.id === id ? { ...t, completed: newCompleted } : t));
+      return;
+    }
+
     const { error } = await supabase.from("tasks").update({ completed: newCompleted }).eq("id", id);
 
     if (error) {
@@ -162,6 +185,16 @@ const Index = () => {
 
   const deleteTask = async (id: string) => {
     const task = tasks.find(t => t.id === id);
+    
+    if (!supabase) {
+      // Локальное удаление без Supabase
+      setTasks(prev => prev.filter(t => t.id !== id));
+      if (task) {
+        toast({ title: "Задача удалена", description: `"${task.title}" удалена из списка дел.` });
+      }
+      return;
+    }
+    
     const { error } = await supabase.from("tasks").delete().eq("id", id);
 
     if (error) {
