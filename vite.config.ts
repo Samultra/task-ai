@@ -4,7 +4,8 @@ import path from "path";
 
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => ({
-  base: "/task-ai/",
+  // На Vercel нужен base "/", на GitHub Pages под-путь "/task-ai/"
+  base: process.env.VERCEL ? "/" : "/task-ai/",
   server: {
     host: "::",
     port: 8080,
