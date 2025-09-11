@@ -1,4 +1,5 @@
-const API_URL = "https://api.openai.com/v1/chat/completions";
+const OPENAI_API_URL = "https://api.openai.com/v1/chat/completions";
+const API_BASE = (import.meta as any).env?.VITE_API_BASE as string | undefined;
 
 function getApiKey(): string {
 	// Попробуем несколько способов получить API ключ
@@ -47,39 +48,43 @@ function getModel(): string {
 
 async function callOpenAI(messages: { role: "user"|"assistant"|"system"; content: string }[]) {
 	const model = getModel();
-	const apiKey = getApiKey();
-	
+
+	const useProxy = !!API_BASE || (typeof window !== 'undefined' && window.location.hostname.endsWith('github.io'));
+	const proxyUrl = (API_BASE ? `${API_BASE}` : '') + '/api/chat';
+	const url = useProxy ? proxyUrl : OPENAI_API_URL;
+	const requestBody = { model, messages, temperature: 0.6 };
+
 	console.log('=== OpenAI Request Debug ===');
 	console.log('Using model:', model);
-	console.log('API URL:', API_URL);
-	console.log('Authorization header:', `Bearer ${apiKey.substring(0, 15)}...`);
-	console.log('Request body:', JSON.stringify({ model, messages, temperature: 0.6 }, null, 2));
+	console.log('Using proxy:', useProxy, 'URL:', url);
+	console.log('Request body:', JSON.stringify(requestBody, null, 2));
 	console.log('================================');
-	
-	const requestBody = { model, messages, temperature: 0.6 };
-	
-	const res = await fetch(API_URL, {
+
+	const headers: Record<string, string> = { 'Content-Type': 'application/json' };
+	if (!useProxy) {
+		const apiKey = getApiKey();
+		headers['Authorization'] = `Bearer ${apiKey}`;
+	}
+
+	const res = await fetch(url, {
 		method: 'POST',
-		headers: {
-			'Content-Type': 'application/json',
-			'Authorization': `Bearer ${apiKey}`,
-		},
+		headers,
 		body: JSON.stringify(requestBody)
 	});
-	
+
 	const text = await res.text();
 	console.log('=== OpenAI Response Debug ===');
 	console.log('Response status:', res.status);
 	console.log('Response headers:', Object.fromEntries(res.headers.entries()));
 	console.log('Response body:', text);
 	console.log('================================');
-	
+
 	if (!res.ok) {
 		const errorMsg = `OpenAI API Error ${res.status}: ${text}`;
 		console.error(errorMsg);
 		throw new Error(errorMsg);
 	}
-	
+
 	const json = JSON.parse(text);
 	return (json.choices?.[0]?.message?.content ?? '').trim();
 }
